@@ -6,6 +6,11 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+
+
 from django.core.cache import cache
 
 from .models import Category, Product, Review
@@ -22,7 +27,6 @@ from .serializers import (
 from common.permissions import (
     IsAnonymousReadOnly,
     IsOwnerOrReadOnly,
-    IsModeratorPermission,
 )
 
 
@@ -46,6 +50,7 @@ class CategoryListCreateAPIView(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = CustomPagination
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, *args, **kwargs):
         serializer = CategoryValidateSerializer(data=request.data)
@@ -76,7 +81,13 @@ class ProductListCreateAPIView(ListCreateAPIView):
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
-    permission_classes = [IsOwner | IsAnonymous]
+    permission_classes = [IsOwnerOrReadOnly | IsAnonymousReadOnly]
+
+
+    def post(self,request, *args, **kwargs):
+        from rest_framework_simplejwt.tokens import AccessToken
+        user_email=AccessToken['email']
+        print("user_email",user_email)
 
     def get_permissions(self):
         user = self.request.user
@@ -124,21 +135,12 @@ class ProductListCreateAPIView(ListCreateAPIView):
         return Response(data=ProductSerializer(product).data,
                         status=status.HTTP_201_CREATED)
 
-
 class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.select_related('category').all()
-    serializer_class = ProductSerializer
+    erializer_class = ProductSerializer
     lookup_field = 'id'
-    permission_classes = [IsOwner | IsAnonymous]
+    permission_classes = [IsOwnerOrReadOnly, IsAnonymousReadOnly]
 
-    def get_permissions(self):
-        user = self.request.user
-
-        if not user.is_authenticated:
-            return [IsAnonymousReadOnly()]
-        elif user.is_staff:
-            return [IsModeratorPermission()]
-        return [IsOwnerOrReadOnly()]
 
     def put(self, request, *args, **kwargs):
         product = self.get_object()
@@ -148,7 +150,7 @@ class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
         product.title = serializer.validated_data.get('title')
         product.description = serializer.validated_data.get('description')
         product.price = serializer.validated_data.get('price')
-        product.category = serializer.validated_data.get('category')
+        product.category = serializer.validated_data.get('category'),
         product.save()
 
         return Response(data=ProductSerializer(product).data)

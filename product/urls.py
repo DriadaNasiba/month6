@@ -8,6 +8,8 @@ from .views import (
     ProductWithReviewsAPIView,
     OwnerProductListAPIView,
 )
+from common.permissions import IsOwnerOrReadOnly, IsAnonymousReadOnly
+
 
 urlpatterns = [
     path('', ProductListCreateAPIView.as_view()),

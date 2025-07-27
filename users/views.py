@@ -9,6 +9,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from users.serializers import CustomTokenObtainSerializer
 
+
 from .serializers import (
     RegisterValidateSerializer,
     AuthValidateSerializer,
