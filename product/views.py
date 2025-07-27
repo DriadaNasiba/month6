@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from http.client import responses
+
 from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,10 +9,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
-
-
-
 from django.core.cache import cache
 
 from .models import Category, Product, Review
@@ -140,6 +138,18 @@ class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
     erializer_class = ProductSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAnonymousReadOnly]
+
+    def get(self,request, *args, **kwargs):
+        cached_data =cache.get('product_list')
+        if cached_data:
+            print("работает редис")
+            return Response(data=cached_data, status=status.HTTP_200_OK)
+        response = super().get(request, *args, **kwargs)
+        print(response.data , "обычный response")
+        if response.data.get("count", 0) >0:
+            cache.set("product_list", response_data, timeout=120)
+            return Response
+
 
 
     def put(self, request, *args, **kwargs):

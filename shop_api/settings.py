@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -148,6 +150,8 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+
 
 CACHES = {
     "default": {
