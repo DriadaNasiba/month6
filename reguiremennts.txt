@@ -1,0 +1,26 @@
+asgiref==3.8.1
+async-timeout==5.0.1
+certifi==2025.7.14
+charset-normalizer==3.4.2
+Django==4.2.13
+django-dotenv==1.4.2
+django-jazzmin @ git+https://github.com/farridav/django-jazzmin.git@d269874c96fe5ff6d231c3017cdd4650bc2f3105
+django-querycount==0.8.3
+django-redis==6.0.0
+djangorestframework==3.16.0
+djangorestframework_simplejwt==5.5.1
+drf-yasg==1.21.10
+idna==3.10
+inflection==0.5.1
+packaging==25.0
+psycopg2-binary==2.9.10
+PyJWT==2.10.1
+pytz==2025.2
+PyYAML==6.0.2
+redis==6.2.0
+requests==2.32.4
+sqlparse==0.5.3
+typing_extensions==4.14.1
+tzdata==2025.2
+uritemplate==4.1.1
+urllib3==2.5.0
