@@ -8,6 +8,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from users.serializers import CustomTokenObtainSerializer
+from users.tasks import send_otp_email
+from services.redis_client import random
+import random
+
 
 
 from .serializers import (
@@ -67,10 +71,15 @@ class RegistrationAPIView(CreateAPIView):
             # Create a random 6-digit code
             code = ''.join(random.choices(string.digits, k=6))
 
-            confirmation_code = ConfirmationCode.objects.create(
-                user=user,
-                code=code
-            )
+            def generate_confirmation_code(user_email):
+                key = f"confirm:{user_email}"
+                code = str(random.randint(100000, 999999))
+                r.set(key, code, ex=300)
+                return code
+
+            code = generate_confirmation_code(user.email)
+
+            send_otp_email.delay(email,code)
 
         return Response(
             status=status.HTTP_201_CREATED,

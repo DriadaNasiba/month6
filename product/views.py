@@ -79,7 +79,7 @@ class ProductListCreateAPIView(ListCreateAPIView):
     queryset = Product.objects.select_related('category').all()
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
-    permission_classes = [IsOwnerOrReadOnly | IsAnonymousReadOnly]
+    permission_classes = [IsOwner | IsAnonymous]
 
 
     def post(self,request, *args, **kwargs):
@@ -218,3 +218,22 @@ class ProductWithReviewsAPIView(APIView):
 
         serializer = ProductWithReviewsSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+class ProductCreateAPIView(CreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if not user.birthday:
+            raise serializers.ValidationError("Укажите дату рождения в профиле.")
+
+        today = date.today()
+        age = today.year - user.birthday.year - (
+            (today.month, today.day) < (user.birthday.month, user.birthday.day)
+        )
+
+        if age < 18:
+            raise serializers.ValidationError("Вам должно быть 18 лет, чтобы создать продукт.")
+
+        serializer.save(owner=user)

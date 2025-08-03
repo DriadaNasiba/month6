@@ -6,6 +6,7 @@ from users.models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
+
 class UserBaseSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=150)
     password = serializers.CharField()
@@ -53,6 +54,7 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token['email'] = user.email
+        token['birthday'] = str(user.birthday) if user.birthday else None
         return token
 
 
