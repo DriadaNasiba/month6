@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+https://console.cloud.google.com/auth/clients/387157163199-ep668k3v0vhanspbhh36stllufs2u72f.apps.googleusercontent.com?inv=1&invt=Ab34SA&project=geekstest-467214
+=======
 https://accounts.google.com/o/oauth2/v2/auth?
 client_id=ваш_id&
 redirect_uri=http://localhost:8000/api/v1/users/google-login&
@@ -5,3 +8,4 @@ response_type=code&
 scope=openid%20email%20profile&
 access_type=offline&
 prompt=consent
+>>>>>>> aa0d8d2aca20b0236fba9814baa464d1e69c63c0
